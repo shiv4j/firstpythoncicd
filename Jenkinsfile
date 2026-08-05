@@ -5,7 +5,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/YOUR_USERNAME/PythonCalculator.git'
+                git 'https://github.com/shiv4j/firstpythoncicd.git'
             }
         }
 
