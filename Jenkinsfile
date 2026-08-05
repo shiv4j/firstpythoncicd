@@ -5,25 +5,27 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/shiv4j/firstpythoncicd.git'
+                git branch: 'main', url: 'https://github.com/shiv4j/firstpythoncicd.git'
             }
         }
 
         stage('Verify Python') {
             steps {
                 bat 'python --version'
+                bat 'pip --version'
             }
         }
 
         stage('Install Dependencies') {
             steps {
+                bat 'python -m pip install --upgrade pip'
                 bat 'pip install -r requirements.txt'
             }
         }
 
         stage('Run Tests') {
             steps {
-                bat 'python -m unittest test_calculator.py'
+                bat 'python -m unittest discover'
             }
         }
 
@@ -40,6 +42,9 @@ pipeline {
         }
         failure {
             echo 'Build Failed'
+        }
+        always {
+            echo 'Pipeline Finished'
         }
     }
 }
