@@ -5,33 +5,51 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/shiv4j/firstpythoncicd.git'
+                git branch: 'main',
+                    url: 'https://github.com/shiv4j/firstpythoncicd.git'
             }
         }
 
         stage('Verify Python') {
             steps {
                 bat 'python --version'
-                bat 'pip --version'
+                bat 'python -m pip --version'
+            }
+        }
+
+        stage('Upgrade pip') {
+            steps {
+                bat 'python -m pip install --upgrade pip'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                bat 'python -m pip install --upgrade pip'
-                bat 'pip install -r requirements.txt'
+                bat 'python -m pip install -r requirements.txt'
             }
         }
 
-        stage('Run Tests') {
+        stage('Install PyInstaller') {
             steps {
-                bat 'python -m unittest discover'
+                bat 'python -m pip install pyinstaller'
             }
         }
 
-        stage('Run Application') {
+        stage('Run Unit Tests') {
             steps {
-                bat 'python calculator.py'
+                bat 'python -m unittest discover -v'
+            }
+        }
+
+        stage('Create EXE') {
+            steps {
+                bat 'python -m PyInstaller --onefile calculator.py'
+            }
+        }
+
+        stage('Archive EXE') {
+            steps {
+                archiveArtifacts artifacts: 'dist/*.exe', fingerprint: true
             }
         }
     }
@@ -39,10 +57,13 @@ pipeline {
     post {
         success {
             echo 'Build Successful'
+            echo 'calculator.exe has been created and archived.'
         }
+
         failure {
             echo 'Build Failed'
         }
+
         always {
             echo 'Pipeline Finished'
         }
